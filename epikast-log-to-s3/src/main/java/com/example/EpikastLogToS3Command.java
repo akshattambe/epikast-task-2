@@ -46,8 +46,6 @@ public class EpikastLogToS3Command implements Runnable {
 
         if(!isValidUrl(fileUrl)){
             System.out.println("Invalid Url. Url must have path.");
-        }else{
-//            System.out.println("Valid Url.");
         }
 
         HttpURLConnection httpConn = null;
@@ -60,7 +58,7 @@ public class EpikastLogToS3Command implements Runnable {
         } catch (MalformedURLException e) {
             System.out.println("Malformed URL Host: " + e.getMessage());
         } catch (IOException e) {
-            System.out.println("IOException caught" + e.getMessage());
+            System.out.println("IO Exception caught: " + e.getMessage());
         }finally {
             if (httpConn != null) {
                 httpConn.disconnect();

@@ -8,6 +8,9 @@
 
 - [Micronaut Maven Plugin documentation](https://micronaut-projects.github.io/micronaut-maven-plugin/latest/)
 
+Valid Url Path for testing:
+1. http://80.90.47.7/anupam.acrylic_16.apk.diffoscope.txt
+
 **Exception handling**
 
 1. MalformedURLException
