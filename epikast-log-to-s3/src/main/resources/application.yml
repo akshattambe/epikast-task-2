@@ -1,0 +1,11 @@
+micronaut:
+  application:
+    name: epikastLogToS3
+
+aws:
+  region: us-east-2
+  bucket:
+    name: logtos3bucket
+  profile:
+    path: profile.properties
+    name: newUser
