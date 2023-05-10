@@ -19,6 +19,7 @@
     <release.version>17</release.version>
     <micronaut.version>3.9.1</micronaut.version>
     <exec.mainClass>com.example.EpikastLogToS3Command</exec.mainClass>
+    <aws.version>1.12.429</aws.version>
   </properties>
 
   <repositories>
@@ -48,6 +49,11 @@
       <groupId>io.micronaut.picocli</groupId>
       <artifactId>micronaut-picocli</artifactId>
       <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.amazonaws</groupId>
+      <artifactId>aws-java-sdk-s3</artifactId>
+      <version>${aws.version}</version>
     </dependency>
     <dependency>
       <groupId>jakarta.annotation</groupId>

@@ -7,3 +7,13 @@
 ---
 
 - [Micronaut Maven Plugin documentation](https://micronaut-projects.github.io/micronaut-maven-plugin/latest/)
+
+**Exception handling**
+
+1. MalformedURLException
+   1. example.com
+   2. htt://example.com
+   3. exa@mple.com
+4. UnknownHostException
+   1. https://notarealhostname.com
+   2. https://hostname-that-cannot-be-resolved.com/test.log
