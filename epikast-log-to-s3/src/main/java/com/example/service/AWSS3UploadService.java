@@ -146,4 +146,3 @@ public class AWSS3UploadService {
         return new String[] { baseUrl, fileName };
     }
 }
-

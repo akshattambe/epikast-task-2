@@ -71,7 +71,7 @@ public class EpikastLogToS3Command implements Runnable {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-}
+    }
 
     public static boolean isValidUrl(String urlString) {
         try {
