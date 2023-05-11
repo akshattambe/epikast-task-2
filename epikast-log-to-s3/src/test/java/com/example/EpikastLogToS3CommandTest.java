@@ -1,5 +1,6 @@
 package com.example;
 
+import com.example.service.AWSS3UploadService;
 import io.micronaut.configuration.picocli.PicocliRunner;
 import io.micronaut.context.ApplicationContext;
 import io.micronaut.context.env.Environment;
@@ -11,6 +12,10 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class EpikastLogToS3CommandTest {
+
+    private AWSS3UploadService awss3UploadServicemock;
+
+
 
     @Test
     public void testWithCommandLineOption() throws Exception {

@@ -1,14 +1,10 @@
 package com.example.service;
 
 import com.amazonaws.SdkClientException;
-import com.amazonaws.auth.profile.ProfileCredentialsProvider;
-import com.amazonaws.auth.profile.ProfilesConfigFile;
 import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.*;
 
 import com.example.EpikastLogToS3Command;
-import io.micronaut.context.annotation.Property;
 import io.micronaut.context.annotation.Value;
 import jakarta.inject.Singleton;
 import org.slf4j.Logger;
@@ -25,10 +21,8 @@ import java.util.List;
 
 @Singleton
 public class AWSS3UploadService {
-    private final String profilePath;
-    private final String profileName;
-    private final String region;
-    private final AmazonS3 s3Client;
+
+    private final S3ClientManager s3ClientManager;
 
     private final Logger LOG = LoggerFactory.getLogger(EpikastLogToS3Command.class);
 
@@ -39,21 +33,8 @@ public class AWSS3UploadService {
         return bucketName;
     }
 
-    public AWSS3UploadService(@Property(name = "aws.profile.path") String profilePath,
-                              @Property(name = "aws.profile.name") String profileName,
-                              @Property(name = "aws.region") String region ) {
-        this.profilePath = profilePath;
-        this.profileName = profileName;
-        this.region = region;
-
-        ProfilesConfigFile profilesConfigFile = new ProfilesConfigFile(profilePath);
-        ProfileCredentialsProvider credentialsProvider = new ProfileCredentialsProvider(profilesConfigFile, profileName);
-
-        s3Client = AmazonS3ClientBuilder
-                .standard()
-                .withCredentials(credentialsProvider)
-                .withRegion(region)
-                .build();
+    public AWSS3UploadService(S3ClientManager s3ClientManager){
+        this.s3ClientManager = s3ClientManager;
     }
 
     public void uploadFile(String url) throws IOException {
@@ -63,21 +44,26 @@ public class AWSS3UploadService {
         //Initiate Multipart Upload.
         InitiateMultipartUploadResult initiateMultipartUploadResult = null;
         try {
-            initiateMultipartUploadResult = s3Client.initiateMultipartUpload(new InitiateMultipartUploadRequest(getBucketName(), baseUrlAndFileName[1]));
+            initiateMultipartUploadResult = s3ClientManager.getS3Client().initiateMultipartUpload(new InitiateMultipartUploadRequest(getBucketName(), baseUrlAndFileName[1]));
+
+            // get the part information to the list of part ETags
+            List<PartETag> partETag = getPartETag(url, baseUrlAndFileName[1], initiateMultipartUploadResult, s3ClientManager.getS3Client());
+
+            //Complete multipart Upload.
+            CompleteMultipartUploadRequest completeMultipartUploadRequest = new CompleteMultipartUploadRequest(bucketName, baseUrlAndFileName[1], initiateMultipartUploadResult.getUploadId(), partETag);
+            s3ClientManager.getS3Client().completeMultipartUpload(completeMultipartUploadRequest);
         } catch (SdkClientException e) {
             if (initiateMultipartUploadResult != null) {
-                s3Client.abortMultipartUpload(new AbortMultipartUploadRequest(getBucketName(), baseUrlAndFileName[1], initiateMultipartUploadResult.getUploadId()));
+                s3ClientManager.getS3Client().abortMultipartUpload(new AbortMultipartUploadRequest(getBucketName(), baseUrlAndFileName[1], initiateMultipartUploadResult.getUploadId()));
+                s3ClientManager.closeS3Client();
             }
             LOG.error(e.getMessage());
             throw new SdkClientException(e);
+        }finally {
+            s3ClientManager.closeS3Client();
         }
 
-        // get the part information to the list of part ETags
-        List<PartETag> partETag = getPartETag(url, baseUrlAndFileName[1], initiateMultipartUploadResult, s3Client);
 
-        //Complete multipart Upload.
-        CompleteMultipartUploadRequest completeMultipartUploadRequest = new CompleteMultipartUploadRequest(bucketName, baseUrlAndFileName[1], initiateMultipartUploadResult.getUploadId(), partETag);
-        s3Client.completeMultipartUpload(completeMultipartUploadRequest);
     }
 
     private List<PartETag> getPartETag (String urlString, String filename, InitiateMultipartUploadResult initiateMultipartUploadResult, AmazonS3 s3Client)  throws IOException{
@@ -94,8 +80,6 @@ public class AWSS3UploadService {
             // Get the content length of the file
             long fileLength = httpURLConnection.getContentLengthLong();
             objectMetadata.setContentLength(fileLength);
-
-
 
             // Define the part size, in bytes, for the multi-part upload
             long partSize = 5 * 1024 * 1024; // 5 MB
