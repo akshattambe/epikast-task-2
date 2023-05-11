@@ -66,7 +66,7 @@ public class AWSS3UploadService {
 
     }
 
-    private List<PartETag> getPartETag (String urlString, String filename, InitiateMultipartUploadResult initiateMultipartUploadResult, AmazonS3 s3Client)  throws IOException{
+    public List<PartETag> getPartETag (String urlString, String filename, InitiateMultipartUploadResult initiateMultipartUploadResult, AmazonS3 s3Client)  throws IOException{
 
         URL url = new URL(urlString);
         HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
