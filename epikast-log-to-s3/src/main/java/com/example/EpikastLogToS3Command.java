@@ -4,6 +4,7 @@ import com.example.service.AWSS3UploadService;
 import io.micronaut.configuration.picocli.PicocliRunner;
 
 import io.micronaut.core.util.StringUtils;
+import jakarta.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import picocli.CommandLine.Command;
@@ -21,18 +22,18 @@ public class EpikastLogToS3Command implements Runnable {
     @Option(names = {"-u", "--url"}, description = "File url")
     private String fileUrl;
 
-    private final AWSS3UploadService awss3UploadService;
+    private AWSS3UploadService awss3UploadService;
 
     public EpikastLogToS3Command() {
-        this.awss3UploadService = null; // or initialize with an appropriate value
+        this.awss3UploadService = awss3UploadService;
     }
 
-
+    @Inject
     public EpikastLogToS3Command(AWSS3UploadService awss3UploadService) {
         this.awss3UploadService = awss3UploadService;
     }
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) {
         PicocliRunner.run(EpikastLogToS3Command.class, args);
     }
 
@@ -65,12 +66,11 @@ public class EpikastLogToS3Command implements Runnable {
             }
         }
 
-
-//        try {
-//            awss3UploadService.uploadFile(fileUrl);
-//        } catch (IOException e) {
-//            throw new RuntimeException(e);
-//        }
+        try {
+            awss3UploadService.uploadFile(fileUrl);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
 }
 
     public static boolean isValidUrl(String urlString) {
