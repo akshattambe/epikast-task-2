@@ -78,6 +78,12 @@ public class EpikastLogToS3Command implements Runnable {
         }
     }
 
+    /**
+     * Method to check if a URL string is valid.
+     * It checks if the URL has a non-empty path and if the path ends with .txt or .log.
+     * @param urlString
+     * @return
+     */
     public static boolean isValidUrl(String urlString) {
         try {
             URL url = new URL(urlString);
