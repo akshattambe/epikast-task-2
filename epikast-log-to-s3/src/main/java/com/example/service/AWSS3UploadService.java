@@ -109,14 +109,6 @@ public class AWSS3UploadService {
         return partETags;
     }
 
-    private InputStream getInputStream(String urlString) throws IOException {
-        URL url = new URL(urlString);
-        HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
-        InputStream inputStream = httpURLConnection.getInputStream();
-
-        return inputStream;
-    }
-
     public static String extractFileNameFromUrl(String url) {
         int lastIndex = url.lastIndexOf("/");
         String fileName = url.substring(lastIndex + 1);
