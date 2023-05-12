@@ -1,16 +1,23 @@
 package com.example.service;
 
+import com.amazonaws.SdkClientException;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.*;
+import com.example.EpikastLogToS3Command;
+import io.micronaut.context.annotation.Property;
+import io.micronaut.context.annotation.Value;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -19,46 +26,69 @@ import static org.mockito.Mockito.*;
 
 public class AWSS3UploadServiceTest {
 
+    private final Logger LOG = LoggerFactory.getLogger(AWSS3UploadServiceTest.class);
+    private static final String URL = "http://80.90.47.7/anupam.acrylic_16.apk.diffoscope.txt";
+    private static final String BUCKET_NAME = "test-bucket";
+    private static final String FILE_NAME = "anupam.acrylic_16.apk.diffoscope.txt";
+    private static final long FILE_LENGTH = 1024;
+    private static final int PART_NUMBER = 1;
+    private static final long PART_SIZE = 5 * 1024 * 1024;
+
     @Mock
     private S3ClientManager s3ClientManager;
 
     @Mock
-    private AmazonS3 amazonS3Client;
+    private AmazonS3 s3Client;
 
-    private AWSS3UploadService awss3UploadService;
+    @Mock
+    private InitiateMultipartUploadResult initiateMultipartUploadResult;
+
+    @Mock
+    private UploadPartResult uploadPartResult;
+
+    @Mock
+    private InputStream inputStream;
+
+    private AWSS3UploadService awsS3UploadService;
 
     @Before
-    public void setup(){
-
-        awss3UploadService = new AWSS3UploadService(s3ClientManager);
+    public void setUp() throws Exception {
+        MockitoAnnotations.initMocks(this);
+        awsS3UploadService = new AWSS3UploadService(s3ClientManager);
+        when(s3ClientManager.getS3Client()).thenReturn(s3Client);
+        when(initiateMultipartUploadResult.getUploadId()).thenReturn("test-upload-id");
+        when(uploadPartResult.getPartETag()).thenReturn(new PartETag(PART_NUMBER, "test-etag"));
+        when(inputStream.read(any(byte[].class))).thenReturn((int) FILE_LENGTH);
+        when(s3Client.initiateMultipartUpload(any(InitiateMultipartUploadRequest.class))).thenReturn(initiateMultipartUploadResult);
+        when(s3Client.uploadPart(any(UploadPartRequest.class))).thenReturn(uploadPartResult);
+        when(s3Client.completeMultipartUpload(any(CompleteMultipartUploadRequest.class))).thenReturn(new CompleteMultipartUploadResult());
     }
 
+    @After
+    public void teardown(){
+        awsS3UploadService = null;
+        s3ClientManager = null;
+        s3Client = null;
+        inputStream = null;
+        uploadPartResult = null;
+        initiateMultipartUploadResult = null;
+    }
+
+
     @Test
-    public void testUploadFileToS3Bucket() throws IOException {
-        //Arrange
-        String bucketName = "test-bucket";
-        String url = "http://80.90.47.7/anupam.acrylic_16.apk.diffoscope.txt";
-        String filename = "anupam.acrylic_16.apk.diffoscope.txt";
+    public void testUploadFile() throws IOException {
+        awsS3UploadService.uploadFile(URL);
+        verify(s3ClientManager, times(3)).getS3Client();
+        verify(s3Client, times(1)).initiateMultipartUpload(any(InitiateMultipartUploadRequest.class));
+        verify(s3Client, times(1)).uploadPart(any(UploadPartRequest.class));
+        verify(s3Client, times(1)).completeMultipartUpload(any(CompleteMultipartUploadRequest.class));
+        verifyNoMoreInteractions(s3Client);
+    }
 
-        MockitoAnnotations.openMocks(this);
-        when(s3ClientManager.getS3Client()).thenReturn(this.amazonS3Client);
-
-        //Act
-        InitiateMultipartUploadResult initiateMultipartUploadResult = mock(InitiateMultipartUploadResult.class);
-        when(s3ClientManager.getS3Client().initiateMultipartUpload(any())).thenReturn(initiateMultipartUploadResult);
-
-        UploadPartResult uploadResult = mock(UploadPartResult.class);
-        when(s3ClientManager.getS3Client().uploadPart(any())).thenReturn(uploadResult);
-
-        List<PartETag> partETag = awss3UploadService.getPartETag(url, filename, initiateMultipartUploadResult, s3ClientManager.getS3Client());
-
-        CompleteMultipartUploadRequest completeMultipartUploadRequest = mock(CompleteMultipartUploadRequest.class);
-        CompleteMultipartUploadResult completeMultipartUploadResult = mock(CompleteMultipartUploadResult.class);
-        when(s3ClientManager.getS3Client().completeMultipartUpload(completeMultipartUploadRequest)).thenReturn(completeMultipartUploadResult);
-        when(completeMultipartUploadResult.getBucketName()).thenReturn(bucketName);
-
-        //Assert
-        assertEquals(bucketName, completeMultipartUploadResult.getBucketName());
+    @Test(expected = SdkClientException.class)
+    public void testUploadFileWithSdkClientException() throws IOException {
+        doThrow(new SdkClientException("test exception")).when(s3Client).initiateMultipartUpload(any(InitiateMultipartUploadRequest.class));
+        awsS3UploadService.uploadFile(URL);
     }
 
 }
