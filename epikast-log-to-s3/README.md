@@ -51,3 +51,6 @@ java -jar target/epikast-log-to-s3-0.1.jar --url <url>
    1. https://notarealhostname.com
    2. https://hostname-that-cannot-be-resolved.com/test.log
 ```
+
+TODO:
+S3 bucket clean up at teardown.
