@@ -1,33 +1,58 @@
 package com.example;
 
+import com.example.EpikastLogToS3Command;
 import com.example.service.AWSS3UploadService;
-import io.micronaut.configuration.picocli.PicocliRunner;
-import io.micronaut.context.ApplicationContext;
-import io.micronaut.context.env.Environment;
+import org.junit.Before;
+import org.junit.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
-import java.io.ByteArrayOutputStream;
-import java.io.PrintStream;
-import org.junit.jupiter.api.Test;
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.URL;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
 
 public class EpikastLogToS3CommandTest {
 
-    private AWSS3UploadService awss3UploadServicemock;
+    @Mock
+    private AWSS3UploadService awsS3UploadService;
 
+    @InjectMocks
+    private EpikastLogToS3Command epikastLogToS3Command;
+
+    @Before
+    public void setUp() throws Exception {
+        MockitoAnnotations.initMocks(this);
+    }
 
 
     @Test
-    public void testWithCommandLineOption() throws Exception {
-//        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-//        System.setOut(new PrintStream(baos));
-//
-//        try (ApplicationContext ctx = ApplicationContext.run(Environment.CLI, Environment.TEST)) {
-//            String[] args = new String[] { "-v" };
-//            PicocliRunner.run(EpikastLogToS3Command.class, ctx, args);
-
-            // epikast-log-to-s3
-//            assertTrue(baos.toString().contains("Hi!"));
-//        }
+    public void testValidUrl() {
+        assertTrue(EpikastLogToS3Command.isValidUrl("http://www.example.com/path/to/file.txt"));
+        assertTrue(EpikastLogToS3Command.isValidUrl("http://www.example.com/path/to/file.log"));
+        assertFalse(EpikastLogToS3Command.isValidUrl("http://www.example.com/path/to/file.jpg"));
+        assertFalse(EpikastLogToS3Command.isValidUrl("http://www.example.com/path/to/"));
+        assertFalse(EpikastLogToS3Command.isValidUrl("http://www.example.com/"));
     }
+
+    @Test
+    public void testMissingUrl() throws IOException {
+        epikastLogToS3Command.setFileUrl(null);
+        epikastLogToS3Command.run();
+        verify(awsS3UploadService, never()).uploadFile(anyString());
+    }
+
+    @Test
+    public void testUploadFile() throws Exception {
+        String fileUrl = "http://www.example.com/path/to/file.txt";
+        epikastLogToS3Command.setFileUrl(fileUrl);
+        doNothing().when(awsS3UploadService).uploadFile(fileUrl);
+        epikastLogToS3Command.run();
+        verify(awsS3UploadService, times(1)).uploadFile(fileUrl);
+    }
+
+
 }

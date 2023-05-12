@@ -6,6 +6,7 @@ import com.amazonaws.services.s3.model.*;
 import com.example.EpikastLogToS3Command;
 import io.micronaut.context.annotation.Property;
 import io.micronaut.context.annotation.Value;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -63,6 +64,17 @@ public class AWSS3UploadServiceTest {
         when(s3Client.completeMultipartUpload(any(CompleteMultipartUploadRequest.class))).thenReturn(new CompleteMultipartUploadResult());
     }
 
+    @After
+    public void teardown(){
+        awsS3UploadService = null;
+        s3ClientManager = null;
+        s3Client = null;
+        inputStream = null;
+        uploadPartResult = null;
+        initiateMultipartUploadResult = null;
+    }
+
+
     @Test
     public void testUploadFile() throws IOException {
         awsS3UploadService.uploadFile(URL);
@@ -78,9 +90,6 @@ public class AWSS3UploadServiceTest {
         doThrow(new SdkClientException("test exception")).when(s3Client).initiateMultipartUpload(any(InitiateMultipartUploadRequest.class));
         awsS3UploadService.uploadFile(URL);
     }
-
-
-
 
 }
 

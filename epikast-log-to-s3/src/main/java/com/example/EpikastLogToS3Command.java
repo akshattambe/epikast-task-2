@@ -1,6 +1,7 @@
 package com.example;
 
 import com.example.service.AWSS3UploadService;
+import com.fasterxml.jackson.annotation.JsonGetter;
 import io.micronaut.configuration.picocli.PicocliRunner;
 
 import io.micronaut.core.util.StringUtils;
@@ -19,10 +20,15 @@ public class EpikastLogToS3Command implements Runnable {
 
     private final Logger LOG = LoggerFactory.getLogger(EpikastLogToS3Command.class);
 
+    private AWSS3UploadService awss3UploadService;
+
     @Option(names = {"-u", "--url"}, description = "File url")
     private String fileUrl;
 
-    private AWSS3UploadService awss3UploadService;
+    public String setFileUrl(String url) {
+        fileUrl = url;
+        return fileUrl;
+    }
 
     public EpikastLogToS3Command() {
         this.awss3UploadService = awss3UploadService;
@@ -83,4 +89,5 @@ public class EpikastLogToS3Command implements Runnable {
             return false;
         }
     }
+
 }
