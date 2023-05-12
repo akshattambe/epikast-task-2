@@ -1,7 +1,6 @@
 package com.example;
 
 import com.example.service.AWSS3UploadService;
-import com.fasterxml.jackson.annotation.JsonGetter;
 import io.micronaut.configuration.picocli.PicocliRunner;
 
 import io.micronaut.core.util.StringUtils;
@@ -63,7 +62,7 @@ public class EpikastLogToS3Command implements Runnable {
         } catch (UnknownHostException e) {
             System.out.println("Unknown Host: " + e.getMessage());
         } catch (MalformedURLException e) {
-            System.out.println("Malformed URL Host: " + e.getMessage());
+            System.out.println("Malformed URL: " + e.getMessage());
         } catch (IOException e) {
             System.out.println("IO Exception caught: " + e.getMessage());
         }finally {

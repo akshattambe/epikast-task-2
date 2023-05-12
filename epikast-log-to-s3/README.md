@@ -52,5 +52,8 @@ java -jar target/epikast-log-to-s3-0.1.jar --url <url>
    2. https://hostname-that-cannot-be-resolved.com/test.log
 ```
 
-TODO:
-S3 bucket clean up at teardown.
+Enhancements:
+1. S3 bucket clean up at teardown.
+2. Integration tests validating the uploads to S3
+3. More Unit tests
+4. Performance monitoring

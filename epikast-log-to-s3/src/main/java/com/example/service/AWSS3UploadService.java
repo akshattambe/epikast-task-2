@@ -118,25 +118,10 @@ public class AWSS3UploadService {
     }
 
     public static String extractFileNameFromUrl(String url) {
-        // Get the last index of the '/' character in the URL
         int lastIndex = url.lastIndexOf("/");
-
-        // Extract the URL and file name from the given URL
-//        String baseUrl = url.substring(0, lastIndex + 1); // Add 1 to include the '/'
         String fileName = url.substring(lastIndex + 1);
 
         // Return the base URL and file name as an array
         return  fileName;
     }
-/*    private static String[] extractBaseUrlAndFileName(String url) {
-        // Get the last index of the '/' character in the URL
-        int lastIndex = url.lastIndexOf("/");
-
-        // Extract the URL and file name from the given URL
-        String baseUrl = url.substring(0, lastIndex + 1); // Add 1 to include the '/'
-        String fileName = url.substring(lastIndex + 1);
-
-        // Return the base URL and file name as an array
-        return new String[] { baseUrl, fileName };
-    }*/
 }
