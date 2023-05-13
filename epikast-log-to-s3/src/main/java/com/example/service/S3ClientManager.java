@@ -7,13 +7,17 @@ import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import io.micronaut.context.annotation.Property;
 import jakarta.inject.Singleton;
 
+/**
+ * This service class is responsible for managing and providing an instance of
+ * the AmazonS3 client object to other parts of the application.
+ */
 @Singleton
 public class S3ClientManager {
     private final AmazonS3 s3Client;
 
     /**
-     * This service class is responsible for managing and providing an instance of
-     * the AmazonS3 client object to other parts of the application.
+     * Constructor of S3ClientManager service class.
+     *
      * @param profilePath - Path to AWS credentials from the specified profile.
      * @param profileName - Name of the AWS S3 profile.
      * @param region - AWS region where the S3 bucket is located

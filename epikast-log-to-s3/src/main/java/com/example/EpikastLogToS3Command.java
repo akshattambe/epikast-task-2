@@ -16,7 +16,6 @@ import java.net.*;
 /**
  * EpikastLogToS3Command class defines a command-line interface (CLI) application
  * to upload log files to Amazon S3.
- *
  * The class uses the picocli library to parse command-line arguments and options,
  * and the AWSS3UploadService class to upload the log files to Amazon S3.
  */
@@ -26,22 +25,13 @@ public class EpikastLogToS3Command implements Runnable {
 
     private final Logger LOG = LoggerFactory.getLogger(EpikastLogToS3Command.class);
 
-    private AWSS3UploadService awss3UploadService;
+    private final AWSS3UploadService awss3UploadService;
 
     /**
      * Defines a field called fileUrl.
      * The @Option annotation is from the Picocli library and
      * is used to declare a command line option for a CLI application.
-     *
-     * @Option annotation is from the Picocli library and
-     * is used to declare a command line option for a CLI application.
-     *
-     * @param names = {"-u", "--url"} : means that the user can pass either -u <value> or --url=<value>
-     *              as a command line argument to set the value of fileUrl.
-     *
-     * @param description = description = "File url" : provides a description of the option,
-     *                    which will be displayed in the command line help message
-     *
+     * @Option annotation is from the Picocli library and is used to declare a command line option for a CLI application.
      */
     @Option(names = {"-u", "--url"}, description = "File url")
     private String fileUrl;
@@ -49,24 +39,15 @@ public class EpikastLogToS3Command implements Runnable {
     /**
      * Setter method to set the value of the fileUrl field.
      * It returns the newly set fileUrl value. This is used in unit test.
-     * @param url
-     * @return fileUrl
+     * @param url - HTTP path to the publicly available .log or .txt file.
      */
-    public String setFileUrl(String url) {
+    public void setFileUrl(String url) {
         fileUrl = url;
-        return fileUrl;
-    }
-
-    /**
-     * Default constructor.
-     */
-    public EpikastLogToS3Command() {
-        this.awss3UploadService = awss3UploadService;
     }
 
     /**
      * Argument constructor. It sets the value of the Upload service object.
-     * @param awss3UploadService
+     * @param awss3UploadService - Instance of AWSS3UploadService class.
      */
     @Inject
     public EpikastLogToS3Command(AWSS3UploadService awss3UploadService) {
@@ -75,7 +56,7 @@ public class EpikastLogToS3Command implements Runnable {
 
     /**
      * Entry point for the CLI application.
-     * @param args
+     * @param args - CLI arguments. A valid arg would be url path to a .txt ot a .log file.
      */
     public static void main(String[] args) {
         // Parse the command-line arguments and options and run the application.
@@ -130,12 +111,12 @@ public class EpikastLogToS3Command implements Runnable {
     /**
      * Method to check if a URL string is valid.
      * It checks if the URL has a non-empty path and if the path ends with .txt or .log.
-     * @param urlString
+     * @param urlPath - HTTP path to the publicly available .log or .txt file.
      * @return boolean
      */
-    public static boolean isValidUrl(String urlString) {
+    public static boolean isValidUrl(String urlPath) {
         try {
-            URL url = new URL(urlString);
+            URL url = new URL(urlPath);
             String path = url.getPath();
             return !path.isEmpty() && (path.contains(".txt") || path.contains(".log"));
         } catch (Exception e) {
