@@ -78,23 +78,23 @@ public class EpikastLogToS3Command implements Runnable {
             return;
         }
 
-        // Check for possible exceptions.
-        HttpURLConnection httpConn = null;
-        try {
-            URL url = new URL(fileUrl);
-            httpConn = (HttpURLConnection) url.openConnection();
-            httpConn.getInputStream().close();
-        } catch (UnknownHostException e) {
-            System.out.println("Unknown Host: " + e.getMessage());
-        } catch (MalformedURLException e) {
-            System.out.println("Malformed URL: " + e.getMessage());
-        } catch (IOException e) {
-            System.out.println("IO Exception caught: " + e.getMessage());
-        }finally {
-            if (httpConn != null) {
-                httpConn.disconnect();
-            }
-        }
+//        // Check for possible exceptions.
+//        HttpURLConnection httpConn = null;
+//        try {
+//            URL url = new URL(fileUrl);
+//            httpConn = (HttpURLConnection) url.openConnection();
+//            httpConn.getInputStream().close();
+//        } catch (UnknownHostException e) {
+//            System.out.println("Unknown Host: " + e.getMessage());
+//        } catch (MalformedURLException e) {
+//            System.out.println("Malformed URL: " + e.getMessage());
+//        } catch (IOException e) {
+//            System.out.println("IO Exception caught: " + e.getMessage());
+//        }finally {
+//            if (httpConn != null) {
+//                httpConn.disconnect();
+//            }
+//        }
 
         // Calling Upload file service.
         try {
@@ -116,6 +116,28 @@ public class EpikastLogToS3Command implements Runnable {
                 System.out.println("Missing --url parameter");
                 return false;
             }
+
+            // Check for possible exceptions.
+            HttpURLConnection httpConn = null;
+            try {
+                URL url = new URL(urlPath);
+                httpConn = (HttpURLConnection) url.openConnection();
+                httpConn.getInputStream().close();
+            } catch (UnknownHostException e) {
+                System.out.println("Unknown Host: " + e.getMessage());
+                return false;
+            } catch (MalformedURLException e) {
+                System.out.println("Malformed URL: " + e.getMessage());
+                return false;
+            } catch (IOException e) {
+                System.out.println("IO Exception caught: " + e.getMessage());
+                return false;
+            } finally {
+                if (httpConn != null) {
+                    httpConn.disconnect();
+                }
+            }
+
             return (urlPath.contains(".txt") || urlPath.contains(".log"));
         }
         catch (Exception e) {
