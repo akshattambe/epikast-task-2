@@ -40,7 +40,7 @@ public class EpikastLogToS3CommandTest {
 
     @Test
     public void testMissingUrl() throws IOException {
-        epikastLogToS3Command.setFileUrl(null);
+//        epikastLogToS3Command.setFileUrl(null);
         epikastLogToS3Command.run();
         verify(awsS3UploadService, never()).uploadFile(anyString());
     }
