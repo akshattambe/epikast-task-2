@@ -3,9 +3,6 @@ package com.example.service;
 import com.amazonaws.SdkClientException;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.*;
-import com.example.EpikastLogToS3Command;
-import io.micronaut.context.annotation.Property;
-import io.micronaut.context.annotation.Value;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -16,23 +13,15 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.util.ArrayList;
-import java.util.List;
 
-
-import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.*;
 
 public class AWSS3UploadServiceTest {
 
     private final Logger LOG = LoggerFactory.getLogger(AWSS3UploadServiceTest.class);
     private static final String URL = "http://80.90.47.7/anupam.acrylic_16.apk.diffoscope.txt";
-    private static final String BUCKET_NAME = "test-bucket";
-    private static final String FILE_NAME = "anupam.acrylic_16.apk.diffoscope.txt";
     private static final long FILE_LENGTH = 1024;
     private static final int PART_NUMBER = 1;
-    private static final long PART_SIZE = 5 * 1024 * 1024;
 
     @Mock
     private S3ClientManager s3ClientManager;
