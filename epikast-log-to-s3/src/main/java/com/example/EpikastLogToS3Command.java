@@ -72,32 +72,10 @@ public class EpikastLogToS3Command implements Runnable {
         // business logic here
         LOG.info("Log file url: {}", fileUrl);
 
-        // Check of empty string.
-        if (StringUtils.isEmpty(fileUrl)) {
-            System.out.println("Missing --url parameter");
-        }
-
         // Check for valid url string.
         if(!isValidUrl(fileUrl)){
-            System.out.println("Invalid Url. Url must have path.");
-        }
-
-        // Check for possible exceptions.
-        HttpURLConnection httpConn = null;
-        try {
-            URL url = new URL(fileUrl);
-            httpConn = (HttpURLConnection) url.openConnection();
-            httpConn.getInputStream().close();
-        } catch (UnknownHostException e) {
-            System.out.println("Unknown Host: " + e.getMessage());
-        } catch (MalformedURLException e) {
-            System.out.println("Malformed URL: " + e.getMessage());
-        } catch (IOException e) {
-            System.out.println("IO Exception caught: " + e.getMessage());
-        }finally {
-            if (httpConn != null) {
-                httpConn.disconnect();
-            }
+            System.out.println("Invalid Url: " + fileUrl + "\nUrl must have a HTTP path to the publicly available .log or .txt file.");
+            return;
         }
 
         // Calling Upload file service.
@@ -110,16 +88,43 @@ public class EpikastLogToS3Command implements Runnable {
 
     /**
      * Method to check if a URL string is valid.
-     * It checks if the URL has a non-empty path and if the path ends with .txt or .log.
+     * It checks if the URL has a non-empty and a valid path with a .txt or .log file.
      * @param urlPath - HTTP path to the publicly available .log or .txt file.
      * @return boolean
      */
     public static boolean isValidUrl(String urlPath) {
         try {
-            URL url = new URL(urlPath);
-            String path = url.getPath();
-            return !path.isEmpty() && (path.contains(".txt") || path.contains(".log"));
-        } catch (Exception e) {
+
+            // Check for empty path or null.
+            if (StringUtils.isEmpty(urlPath) || (urlPath == null)) {
+                System.out.println("Missing --url parameter");
+                return false;
+            }
+
+            // Check for possible exceptions.
+            HttpURLConnection httpConn = null;
+            try {
+                URL url = new URL(urlPath);
+                httpConn = (HttpURLConnection) url.openConnection();
+                httpConn.getInputStream().close();
+            } catch (UnknownHostException e) {
+                System.out.println("Unknown Host: " + e.getMessage());
+                return false;
+            } catch (MalformedURLException e) {
+                System.out.println("Malformed URL: " + e.getMessage());
+                return false;
+            } catch (IOException e) {
+                System.out.println("IO Exception caught: " + e.getMessage());
+                return false;
+            } finally {
+                if (httpConn != null) {
+                    httpConn.disconnect();
+                }
+            }
+
+            return (urlPath.contains(".txt") || urlPath.contains(".log"));
+        }
+        catch (Exception e) {
             System.out.println(e.getMessage());
             return false;
         }

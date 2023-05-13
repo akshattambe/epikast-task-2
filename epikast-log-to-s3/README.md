@@ -52,6 +52,15 @@ java -jar target/epikast-log-to-s3-0.1.jar --url <url>
    2. https://hostname-that-cannot-be-resolved.com/test.log
 ```
 
+**Invalid Inputs:**
+```
+1. null
+2. " "
+```
+
+
+
+
 Enhancements:
 1. S3 bucket clean up at teardown.
 2. Integration tests validating the uploads to S3
