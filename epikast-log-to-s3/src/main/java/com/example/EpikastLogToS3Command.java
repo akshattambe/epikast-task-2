@@ -72,14 +72,10 @@ public class EpikastLogToS3Command implements Runnable {
         // business logic here
         LOG.info("Log file url: {}", fileUrl);
 
-        // Check of empty string.
-        if (StringUtils.isEmpty(fileUrl)) {
-            System.out.println("Missing --url parameter");
-        }
-
         // Check for valid url string.
         if(!isValidUrl(fileUrl)){
-            System.out.println("Invalid Url. Url must have path.");
+            System.out.println("Invalid Url: " + fileUrl + "\nUrl must have a HTTP path to the publicly available .log or .txt file.");
+            return;
         }
 
         // Check for possible exceptions.
@@ -116,10 +112,13 @@ public class EpikastLogToS3Command implements Runnable {
      */
     public static boolean isValidUrl(String urlPath) {
         try {
-            URL url = new URL(urlPath);
-            String path = url.getPath();
-            return !path.isEmpty() && (path.contains(".txt") || path.contains(".log"));
-        } catch (Exception e) {
+            if (StringUtils.isEmpty(urlPath) || (urlPath == null)) {
+                System.out.println("Missing --url parameter");
+                return false;
+            }
+            return (urlPath.contains(".txt") || urlPath.contains(".log"));
+        }
+        catch (Exception e) {
             System.out.println(e.getMessage());
             return false;
         }

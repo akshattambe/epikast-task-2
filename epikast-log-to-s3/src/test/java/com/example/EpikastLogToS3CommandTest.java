@@ -33,7 +33,11 @@ public class EpikastLogToS3CommandTest {
         assertTrue(EpikastLogToS3Command.isValidUrl("http://www.example.com/path/to/file.log"));
         assertFalse(EpikastLogToS3Command.isValidUrl("http://www.example.com/path/to/file.jpg"));
         assertFalse(EpikastLogToS3Command.isValidUrl("http://www.example.com/path/to/"));
-        assertFalse(EpikastLogToS3Command.isValidUrl("http://www.example.com/"));
+        assertFalse(EpikastLogToS3Command.isValidUrl("exa@mple.com"));
+        assertFalse(EpikastLogToS3Command.isValidUrl("htt://example.com"));
+        assertFalse(EpikastLogToS3Command.isValidUrl("example.com"));
+        assertFalse(EpikastLogToS3Command.isValidUrl(" "));
+        assertFalse(EpikastLogToS3Command.isValidUrl(null));
     }
 
     @Test
