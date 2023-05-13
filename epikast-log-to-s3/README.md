@@ -8,6 +8,16 @@
 
 - [Micronaut Maven Plugin documentation](https://micronaut-projects.github.io/micronaut-maven-plugin/latest/)
 
+**PROJECTS DETAILS**
+
+Fetch a publicly available log file, and store it in a S3 bucket you will create.
+
+**Tools used:**
+1. junit version 4.13.1
+2. mockito version 5.3.1
+3. aws-java-sdk-s3 version 1.12.429
+4. jdk 17
+
 **How to build and run:**
 
 1. Create an AWS account and role for a user.
@@ -52,7 +62,7 @@ java -jar target/epikast-log-to-s3-0.1.jar --url <url>
    2. https://hostname-that-cannot-be-resolved.com/test.log
 ```
 
-**Invalid Inputs:**
+3. Invalid Inputs:
 ```
 1. null
 2. " "
@@ -61,7 +71,7 @@ java -jar target/epikast-log-to-s3-0.1.jar --url <url>
 
 
 
-Enhancements:
+**Enhancements:**
 1. S3 bucket clean up at teardown.
 2. Integration tests validating the uploads to S3
 3. More Unit tests
