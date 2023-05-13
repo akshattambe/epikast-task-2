@@ -78,24 +78,6 @@ public class EpikastLogToS3Command implements Runnable {
             return;
         }
 
-//        // Check for possible exceptions.
-//        HttpURLConnection httpConn = null;
-//        try {
-//            URL url = new URL(fileUrl);
-//            httpConn = (HttpURLConnection) url.openConnection();
-//            httpConn.getInputStream().close();
-//        } catch (UnknownHostException e) {
-//            System.out.println("Unknown Host: " + e.getMessage());
-//        } catch (MalformedURLException e) {
-//            System.out.println("Malformed URL: " + e.getMessage());
-//        } catch (IOException e) {
-//            System.out.println("IO Exception caught: " + e.getMessage());
-//        }finally {
-//            if (httpConn != null) {
-//                httpConn.disconnect();
-//            }
-//        }
-
         // Calling Upload file service.
         try {
             awss3UploadService.uploadFile(fileUrl);
@@ -106,12 +88,14 @@ public class EpikastLogToS3Command implements Runnable {
 
     /**
      * Method to check if a URL string is valid.
-     * It checks if the URL has a non-empty path and if the path ends with .txt or .log.
+     * It checks if the URL has a non-empty and a valid path with a .txt or .log file.
      * @param urlPath - HTTP path to the publicly available .log or .txt file.
      * @return boolean
      */
     public static boolean isValidUrl(String urlPath) {
         try {
+
+            // Check for empty path or null.
             if (StringUtils.isEmpty(urlPath) || (urlPath == null)) {
                 System.out.println("Missing --url parameter");
                 return false;
