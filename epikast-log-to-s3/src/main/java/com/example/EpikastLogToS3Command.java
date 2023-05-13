@@ -26,9 +26,6 @@ public class EpikastLogToS3Command implements Runnable {
 
     private final Logger LOG = LoggerFactory.getLogger(EpikastLogToS3Command.class);
 
-    /**
-     *
-     */
     private AWSS3UploadService awss3UploadService;
 
     /**
