@@ -1,6 +1,5 @@
 package com.example;
 
-import com.example.EpikastLogToS3Command;
 import com.example.service.AWSS3UploadService;
 import org.junit.Before;
 import org.junit.Test;
@@ -9,10 +8,9 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.URL;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.*;
 
 public class EpikastLogToS3CommandTest {
@@ -40,7 +38,6 @@ public class EpikastLogToS3CommandTest {
 
     @Test
     public void testMissingUrl() throws IOException {
-//        epikastLogToS3Command.setFileUrl(null);
         epikastLogToS3Command.run();
         verify(awsS3UploadService, never()).uploadFile(anyString());
     }
