@@ -51,7 +51,7 @@ public class AWSS3UploadService {
             this.amazonS3Client = s3ClientManager.getS3Client();
         } catch (AWSProfileNotFoundException e) {
             // Handle the exception
-            System.out.println("AWSProfileNotFoundException caught: " + e.getMessage());
+            LOG.info("AWSProfileNotFoundException caught: " + e.getMessage());
             this.amazonS3Client = null;
         }
     }
@@ -143,14 +143,11 @@ public class AWSS3UploadService {
         } catch (AmazonServiceException e) {
             // handle any Amazon service exceptions here
             LOG.error(e.getMessage());
-//            throw new RuntimeException("An Amazon service exception occurred while uploading file: " + e.getMessage(), e);
         } catch (AmazonClientException e) {
             // handle any Amazon client exceptions here
             LOG.error(e.getMessage());
-//            throw new RuntimeException("An Amazon client exception occurred while uploading file: " + e.getMessage(), e);
         } catch (Exception e) {
             LOG.error(e.getMessage());
-//            System.out.println("Unknown error occurred: " + e.getMessage());
         }
 
         return partETags;
