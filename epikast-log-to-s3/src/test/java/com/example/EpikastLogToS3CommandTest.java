@@ -34,15 +34,15 @@ public class EpikastLogToS3CommandTest {
      */
     @Test
     public void testValidUrl() {
-        assertTrue(EpikastLogToS3Command.isValidUrl("http://80.90.47.7/anupam.acrylic_16.apk.diffoscope.txt"));
-        assertTrue(EpikastLogToS3Command.isValidUrl("http://www.almhuette-raith.at/apache-log/error.log"));
-        assertFalse(EpikastLogToS3Command.isValidUrl("http://www.example.com/path/to/file.jpg"));
-        assertFalse(EpikastLogToS3Command.isValidUrl("http://www.example.com/path/to/"));
-        assertFalse(EpikastLogToS3Command.isValidUrl("exa@mple.com"));
-        assertFalse(EpikastLogToS3Command.isValidUrl("htt://example.com"));
-        assertFalse(EpikastLogToS3Command.isValidUrl("example.com"));
-        assertFalse(EpikastLogToS3Command.isValidUrl(" "));
-        assertFalse(EpikastLogToS3Command.isValidUrl(null));
+        assertTrue(epikastLogToS3Command.isValidUrl("http://80.90.47.7/anupam.acrylic_16.apk.diffoscope.txt"));
+        assertTrue(epikastLogToS3Command.isValidUrl("http://www.almhuette-raith.at/apache-log/access.log"));
+        assertFalse(epikastLogToS3Command.isValidUrl("http://www.example.com/path/to/file.jpg"));
+        assertFalse(epikastLogToS3Command.isValidUrl("http://www.example.com/path/to/"));
+        assertFalse(epikastLogToS3Command.isValidUrl("exa@mple.com"));
+        assertFalse(epikastLogToS3Command.isValidUrl("htt://example.com"));
+        assertFalse(epikastLogToS3Command.isValidUrl("example.com"));
+        assertFalse(epikastLogToS3Command.isValidUrl(" "));
+        assertFalse(epikastLogToS3Command.isValidUrl(null));
     }
 
     /**

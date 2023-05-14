@@ -1,5 +1,6 @@
 package com.example;
 
+import com.example.exception.AWSProfileNotFoundException;
 import com.example.service.AWSS3UploadService;
 import io.micronaut.configuration.picocli.PicocliRunner;
 
@@ -51,7 +52,7 @@ public class EpikastLogToS3Command implements Runnable {
      */
     @Inject
     public EpikastLogToS3Command(AWSS3UploadService awss3UploadService) {
-        this.awss3UploadService = awss3UploadService;
+            this.awss3UploadService = awss3UploadService;
     }
 
     /**
@@ -60,7 +61,12 @@ public class EpikastLogToS3Command implements Runnable {
      */
     public static void main(String[] args) {
         // Parse the command-line arguments and options and run the application.
-        PicocliRunner.run(EpikastLogToS3Command.class, args);
+        try {
+            PicocliRunner.run(EpikastLogToS3Command.class, args);
+        } catch (Exception e) {
+            // Handle the exception
+            System.out.println("AWSProfileNotFoundException caught: " + e.getMessage());
+        }
     }
 
     /**
@@ -69,9 +75,7 @@ public class EpikastLogToS3Command implements Runnable {
      * 3. Return back to use with validation message if url is not correct.
      */
     public void run() {
-        // business logic here
-        LOG.info("Log file url: {}", fileUrl);
-
+        // business logic here.
         // Check for valid url string.
         if(!isValidUrl(fileUrl)){
             System.out.println("Invalid Url: " + fileUrl + "\nUrl must have a HTTP path to the publicly available .log or .txt file.");
@@ -80,9 +84,15 @@ public class EpikastLogToS3Command implements Runnable {
 
         // Calling Upload file service.
         try {
+            if(awss3UploadService.isS3ClientNull()){
+                return;
+            }
+            LOG.info("Log file url: {}", fileUrl);
             awss3UploadService.uploadFile(fileUrl);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            LOG.error(e.getMessage());
+        } catch (Exception e) {
+            LOG.error(e.getMessage());
         }
     }
 
@@ -92,12 +102,12 @@ public class EpikastLogToS3Command implements Runnable {
      * @param urlPath - HTTP path to the publicly available .log or .txt file.
      * @return boolean
      */
-    public static boolean isValidUrl(String urlPath) {
+    public boolean isValidUrl(String urlPath) {
         try {
 
             // Check for empty path or null.
             if (StringUtils.isEmpty(urlPath) || (urlPath == null)) {
-                System.out.println("Missing --url parameter");
+                LOG.error("Missing --url parameter");
                 return false;
             }
 
@@ -108,24 +118,23 @@ public class EpikastLogToS3Command implements Runnable {
                 httpConn = (HttpURLConnection) url.openConnection();
                 httpConn.getInputStream().close();
             } catch (UnknownHostException e) {
-                System.out.println("Unknown Host: " + e.getMessage());
+                LOG.error(e.getMessage());
                 return false;
             } catch (MalformedURLException e) {
-                System.out.println("Malformed URL: " + e.getMessage());
+                LOG.error(e.getMessage());
                 return false;
             } catch (IOException e) {
-                System.out.println("IO Exception caught: " + e.getMessage());
+                LOG.error(e.getMessage());
                 return false;
             } finally {
                 if (httpConn != null) {
                     httpConn.disconnect();
                 }
             }
-
             return (urlPath.contains(".txt") || urlPath.contains(".log"));
         }
         catch (Exception e) {
-            System.out.println(e.getMessage());
+            LOG.error(e.getMessage());
             return false;
         }
     }

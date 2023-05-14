@@ -27,7 +27,9 @@ import java.util.List;
 @Singleton
 public class AWSS3UploadService {
 
-    private final S3ClientManager s3ClientManager;
+    private S3ClientManager s3ClientManager;
+
+    private AmazonS3 amazonS3Client;
 
     private final Logger LOG = LoggerFactory.getLogger(EpikastLogToS3Command.class);
 
@@ -44,6 +46,15 @@ public class AWSS3UploadService {
      */
     public AWSS3UploadService(S3ClientManager s3ClientManager){
         this.s3ClientManager = s3ClientManager;
+        this.amazonS3Client = s3ClientManager.getS3Client();
+    }
+
+    /**
+     * This method checks if the amazonS3Client instance variable is null or not.
+     * @return true if amazonS3Client is null, false otherwise.
+     */
+    public boolean isS3ClientNull(){
+        return (this.amazonS3Client == null);
     }
 
     /**
@@ -58,22 +69,24 @@ public class AWSS3UploadService {
         //Initiate Multipart Upload.
         InitiateMultipartUploadResult initiateMultipartUploadResult = null;
         try {
-            initiateMultipartUploadResult = s3ClientManager.getS3Client().initiateMultipartUpload(new InitiateMultipartUploadRequest(getBucketName(), fileName));
+            initiateMultipartUploadResult = amazonS3Client.initiateMultipartUpload(new InitiateMultipartUploadRequest(getBucketName(), fileName));
 
             // get the part information to the list of part ETags
-            List<PartETag> partETag = getPartETag(url, fileName, initiateMultipartUploadResult, s3ClientManager.getS3Client());
+            List<PartETag> partETag = getPartETag(url, fileName, initiateMultipartUploadResult, amazonS3Client);
 
             //Complete multipart Upload.
             CompleteMultipartUploadRequest completeMultipartUploadRequest = new CompleteMultipartUploadRequest(bucketName, fileName, initiateMultipartUploadResult.getUploadId(), partETag);
-            s3ClientManager.getS3Client().completeMultipartUpload(completeMultipartUploadRequest);
+            amazonS3Client.completeMultipartUpload(completeMultipartUploadRequest);
         } catch (SdkClientException e) {
-            if (initiateMultipartUploadResult != null) {
-                s3ClientManager.getS3Client().abortMultipartUpload(new AbortMultipartUploadRequest(getBucketName(), fileName, initiateMultipartUploadResult.getUploadId()));
-                s3ClientManager.closeS3Client();
-            }
             LOG.error(e.getMessage());
-            throw new SdkClientException(e);
-        }finally {
+        } catch (IllegalArgumentException e){
+            LOG.error(e.getMessage());
+        } catch (NullPointerException e) {
+            LOG.error(e.getMessage());
+        } finally {
+            if (initiateMultipartUploadResult != null) {
+                amazonS3Client.abortMultipartUpload(new AbortMultipartUploadRequest(getBucketName(), fileName, initiateMultipartUploadResult.getUploadId()));
+            }
             s3ClientManager.closeS3Client();
         }
 
@@ -132,12 +145,12 @@ public class AWSS3UploadService {
             }
         } catch (AmazonServiceException e) {
             // handle any Amazon service exceptions here
-            throw new RuntimeException("An Amazon service exception occurred while uploading file: " + e.getMessage(), e);
+            LOG.error(e.getMessage());
         } catch (AmazonClientException e) {
             // handle any Amazon client exceptions here
-            throw new RuntimeException("An Amazon client exception occurred while uploading file: " + e.getMessage(), e);
+            LOG.error(e.getMessage());
         } catch (Exception e) {
-            System.out.println("Unknown error occurred: " + e.getMessage());
+            LOG.error(e.getMessage());
         }
 
         return partETags;
