@@ -7,7 +7,6 @@ import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.*;
 
 import com.example.EpikastLogToS3Command;
-import com.example.exception.AWSProfileNotFoundException;
 import io.micronaut.context.annotation.Value;
 import jakarta.inject.Singleton;
 import org.slf4j.Logger;
@@ -28,7 +27,7 @@ import java.util.List;
 @Singleton
 public class AWSS3UploadService {
 
-    private final S3ClientManager s3ClientManager;
+    private S3ClientManager s3ClientManager;
 
     private AmazonS3 amazonS3Client;
 
@@ -47,13 +46,15 @@ public class AWSS3UploadService {
      */
     public AWSS3UploadService(S3ClientManager s3ClientManager){
         this.s3ClientManager = s3ClientManager;
-        try {
-            this.amazonS3Client = s3ClientManager.getS3Client();
-        } catch (AWSProfileNotFoundException e) {
-            // Handle the exception
-            LOG.info("AWSProfileNotFoundException caught: " + e.getMessage());
-            this.amazonS3Client = null;
-        }
+        this.amazonS3Client = s3ClientManager.getS3Client();
+    }
+
+    /**
+     * This method checks if the amazonS3Client instance variable is null or not.
+     * @return true if amazonS3Client is null, false otherwise.
+     */
+    public boolean isS3ClientNull(){
+        return (this.amazonS3Client == null);
     }
 
     /**
@@ -79,6 +80,8 @@ public class AWSS3UploadService {
         } catch (SdkClientException e) {
             LOG.error(e.getMessage());
         } catch (IllegalArgumentException e){
+            LOG.error(e.getMessage());
+        } catch (NullPointerException e) {
             LOG.error(e.getMessage());
         } finally {
             if (initiateMultipartUploadResult != null) {

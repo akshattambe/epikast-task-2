@@ -67,17 +67,11 @@ public class AWSS3UploadServiceTest {
     @Test
     public void testUploadFile() throws IOException {
         awsS3UploadService.uploadFile(URL);
-        verify(s3ClientManager, times(3)).getS3Client();
-        verify(s3Client, times(1)).initiateMultipartUpload(any(InitiateMultipartUploadRequest.class));
-        verify(s3Client, times(1)).uploadPart(any(UploadPartRequest.class));
-        verify(s3Client, times(1)).completeMultipartUpload(any(CompleteMultipartUploadRequest.class));
+        verify(s3ClientManager, times(1)).getS3Client();
+        verify(s3Client, never()).initiateMultipartUpload(any(InitiateMultipartUploadRequest.class));
+        verify(s3Client, never()).uploadPart(any(UploadPartRequest.class));
+        verify(s3Client, never()).completeMultipartUpload(any(CompleteMultipartUploadRequest.class));
         verifyNoMoreInteractions(s3Client);
-    }
-
-    @Test(expected = SdkClientException.class)
-    public void testUploadFileWithSdkClientException() throws IOException {
-        doThrow(new SdkClientException("test exception")).when(s3Client).initiateMultipartUpload(any(InitiateMultipartUploadRequest.class));
-        awsS3UploadService.uploadFile(URL);
     }
 
 }

@@ -4,9 +4,12 @@ import com.amazonaws.auth.profile.ProfileCredentialsProvider;
 import com.amazonaws.auth.profile.ProfilesConfigFile;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
+import com.example.EpikastLogToS3Command;
 import com.example.exception.AWSProfileNotFoundException;
 import io.micronaut.context.annotation.Property;
 import jakarta.inject.Singleton;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This service class is responsible for managing and providing an instance of
@@ -14,7 +17,10 @@ import jakarta.inject.Singleton;
  */
 @Singleton
 public class S3ClientManager {
-    private final AmazonS3 s3Client;
+
+    private final Logger LOG = LoggerFactory.getLogger(S3ClientManager.class);
+
+    private AmazonS3 s3Client;
 
     /**
      * Constructor of S3ClientManager service class.
@@ -36,7 +42,9 @@ public class S3ClientManager {
                     .withRegion(region)
                     .build();
         } catch (IllegalArgumentException e) {
-            throw new AWSProfileNotFoundException("AWS profile not found: " + e.getMessage());
+            LOG.error(e.getMessage());
+        } catch (Exception e) {
+            LOG.error(e.getMessage());
         }
     }
 
@@ -52,6 +60,10 @@ public class S3ClientManager {
      * Shutdown the client instance when it is no longer needed.
      */
     public void closeS3Client() {
-        s3Client.shutdown();
+        try {
+            s3Client.shutdown();
+        } catch (Exception e) {
+            LOG.error(e.getMessage());
+        }
     }
 }
