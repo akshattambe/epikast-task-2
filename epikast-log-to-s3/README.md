@@ -78,3 +78,4 @@ java -jar target/epikast-log-to-s3-0.1.jar --url <url>
 3. More Unit tests
 4. Performance monitoring
 5. Configuration file validation, for e.g using static code analysis.
+6. Custom exception
