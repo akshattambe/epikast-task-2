@@ -1,7 +1,7 @@
 # Upload Logfile TO S3 bucket - Project Documentation
 
 ### Description
-Fetch a publicly available log file, and store it in a S3 bucket you will create.
+Fetch a publicly available log file, and store it in an existing S3 bucket. Access keys to the S3 bucket is pre-requisite for this project.
 
 ### Tools used:
 1. junit version 4.13.1
