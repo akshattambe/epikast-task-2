@@ -31,7 +31,7 @@ public class AWSS3UploadService {
 
     private AmazonS3 amazonS3Client;
 
-    private final Logger LOG = LoggerFactory.getLogger(EpikastLogToS3Command.class);
+    private final Logger LOG = LoggerFactory.getLogger(AWSS3UploadService.class);
 
     @Value("${aws.bucket.name}")
     private String bucketName;
