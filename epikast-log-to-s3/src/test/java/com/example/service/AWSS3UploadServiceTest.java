@@ -1,6 +1,5 @@
 package com.example.service;
 
-import com.amazonaws.SdkClientException;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.*;
 import org.junit.After;

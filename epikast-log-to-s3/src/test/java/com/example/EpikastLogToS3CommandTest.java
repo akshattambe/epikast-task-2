@@ -67,4 +67,5 @@ public class EpikastLogToS3CommandTest {
         verify(awsS3UploadService, times(1)).uploadFile(fileUrl);
     }
 
+
 }
