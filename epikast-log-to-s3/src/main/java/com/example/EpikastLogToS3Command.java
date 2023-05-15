@@ -3,6 +3,8 @@ package com.example;
 import com.example.exception.AWSProfileNotFoundException;
 import com.example.service.AWSS3UploadService;
 import io.micronaut.configuration.picocli.PicocliRunner;
+import picocli.CommandLine.InitializationException;
+
 
 import io.micronaut.core.util.StringUtils;
 import jakarta.inject.Inject;
@@ -26,7 +28,7 @@ public class EpikastLogToS3Command implements Runnable {
 
     private final Logger LOG = LoggerFactory.getLogger(EpikastLogToS3Command.class);
 
-    private final AWSS3UploadService awss3UploadService;
+    private  AWSS3UploadService awss3UploadService;
 
     /**
      * Defines a field called fileUrl.
@@ -65,7 +67,7 @@ public class EpikastLogToS3Command implements Runnable {
             PicocliRunner.run(EpikastLogToS3Command.class, args);
         } catch (Exception e) {
             // Handle the exception
-            System.out.println("AWSProfileNotFoundException caught: " + e.getMessage());
+            System.out.println(e.getMessage());
         }
     }
 
@@ -89,7 +91,7 @@ public class EpikastLogToS3Command implements Runnable {
             }
             LOG.info("Log file url: {}", fileUrl);
             awss3UploadService.uploadFile(fileUrl);
-        } catch (IOException e) {
+        } catch (AWSProfileNotFoundException e) {
             LOG.error(e.getMessage());
         } catch (Exception e) {
             LOG.error(e.getMessage());

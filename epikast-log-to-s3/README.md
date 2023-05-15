@@ -62,8 +62,9 @@ java -jar target/epikast-log-to-s3-0.1.jar --url <url>
 ```
 5. IllegalArgumentException
 ```
-   1. When config values for the keys like aws.profile.path or aws.region in config YAML is incorrectly defined.
+   1. When config values for the keys like aws.profile.path or aws.region in application YAML config is incorrectly defined.
    2. When `profile name` is missing from the secrets file.
+   3. When `profile name` is incorrect in the secrets file.
 ```
 6. Invalid Inputs:
 ```

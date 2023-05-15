@@ -6,7 +6,8 @@ import com.amazonaws.SdkClientException;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.*;
 
-import com.example.EpikastLogToS3Command;
+import com.example.exception.AWSProfileNotFoundException;
+import com.example.exception.SecretsInfoMissingException;
 import io.micronaut.context.annotation.Value;
 import jakarta.inject.Singleton;
 import org.slf4j.Logger;
@@ -62,7 +63,7 @@ public class AWSS3UploadService {
      * uploads each part of the file to S3, and finally completes the multipart upload.
      * @param url -  HTTP path to the publicly available .log or .txt file.
      */
-    public void uploadFile(String url) throws IOException {
+    public void uploadFile(String url) {
 
         String fileName = extractFileNameFromUrl(url);
 
@@ -78,9 +79,9 @@ public class AWSS3UploadService {
             CompleteMultipartUploadRequest completeMultipartUploadRequest = new CompleteMultipartUploadRequest(bucketName, fileName, initiateMultipartUploadResult.getUploadId(), partETag);
             amazonS3Client.completeMultipartUpload(completeMultipartUploadRequest);
         } catch (SdkClientException e) {
-            LOG.error(e.getMessage());
+            throw new SecretsInfoMissingException("AWS access key field is not specified in the secrets file. " + e.getMessage(), new SdkClientException(e));
         } catch (IllegalArgumentException e){
-            LOG.error(e.getMessage());
+            throw new AWSProfileNotFoundException("`profile name` is set incorrect in the secrets file. " + e.getMessage(), new IllegalArgumentException(e));
         } catch (NullPointerException e) {
             LOG.error(e.getMessage());
         } finally {
@@ -104,17 +105,15 @@ public class AWSS3UploadService {
      * @param s3Client - AmazonS3 instance.
      * @return PartETag objects that represent the ETag of each uploaded part.
      */
-    public List<PartETag> getPartETag (String urlPath, String filename, InitiateMultipartUploadResult initiateMultipartUploadResult, AmazonS3 s3Client)  throws IOException{
-
-        URL url = new URL(urlPath);
-        HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
-
-        ObjectMetadata objectMetadata = new ObjectMetadata();
-        objectMetadata.setContentType("text/plain");
-
+    public List<PartETag> getPartETag (String urlPath, String filename, InitiateMultipartUploadResult initiateMultipartUploadResult, AmazonS3 s3Client){
         List<PartETag> partETags = new ArrayList<>();
-
         try{
+            URL url = new URL(urlPath);
+            HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
+
+            ObjectMetadata objectMetadata = new ObjectMetadata();
+            objectMetadata.setContentType("text/plain");
+
             // Get the content length of the file
             long fileLength = httpURLConnection.getContentLengthLong();
             objectMetadata.setContentLength(fileLength);
@@ -148,6 +147,8 @@ public class AWSS3UploadService {
             LOG.error(e.getMessage());
         } catch (AmazonClientException e) {
             // handle any Amazon client exceptions here
+            LOG.error(e.getMessage());
+        } catch (IOException e) {
             LOG.error(e.getMessage());
         } catch (Exception e) {
             LOG.error(e.getMessage());

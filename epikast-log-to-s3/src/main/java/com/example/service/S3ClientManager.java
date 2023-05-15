@@ -1,5 +1,6 @@
 package com.example.service;
 
+import com.amazonaws.SdkClientException;
 import com.amazonaws.auth.profile.ProfileCredentialsProvider;
 import com.amazonaws.auth.profile.ProfilesConfigFile;
 import com.amazonaws.services.s3.AmazonS3;
@@ -42,6 +43,8 @@ public class S3ClientManager {
                     .withRegion(region)
                     .build();
         } catch (IllegalArgumentException e) {
+            throw new AWSProfileNotFoundException("`profile name` field is missing from the secrets file.", new IllegalArgumentException(e));
+        } catch (SdkClientException e) {
             LOG.error(e.getMessage());
         } catch (Exception e) {
             LOG.error(e.getMessage());
